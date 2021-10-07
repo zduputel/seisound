@@ -5,7 +5,7 @@
 
 from datetime import datetime, timedelta
 import os, sys, wave, time, struct
-import scipy as sp
+import numpy as np
 
 def rsac(FILE):
     '''
@@ -15,20 +15,20 @@ def rsac(FILE):
     ''' 
     try:
         fid     = open(FILE,'rb')
-        delta   = float(sp.fromfile(fid,'float32',   1)[0])
+        delta   = float(np.fromfile(fid,'float32',   1)[0])
         fid.seek(20,0)
-        b       = float(sp.fromfile(fid,'float32',   1)[0])
+        b       = float(np.fromfile(fid,'float32',   1)[0])
         fid.seek(280,0);
-        nzyear  = int(sp.fromfile(fid,  'int32',   1)[0])
-        nzjday  = int(sp.fromfile(fid,  'int32',   1)[0])
-        nzhour  = int(sp.fromfile(fid,  'int32',   1)[0])
-        nzmin   = int(sp.fromfile(fid,  'int32',   1)[0])
-        nzsec   = int(sp.fromfile(fid,  'int32',   1)[0])
-        nzmsec  = int(sp.fromfile(fid,  'int32',   1)[0])
+        nzyear  = int(np.fromfile(fid,  'int32',   1)[0])
+        nzjday  = int(np.fromfile(fid,  'int32',   1)[0])
+        nzhour  = int(np.fromfile(fid,  'int32',   1)[0])
+        nzmin   = int(np.fromfile(fid,  'int32',   1)[0])
+        nzsec   = int(np.fromfile(fid,  'int32',   1)[0])
+        nzmsec  = int(np.fromfile(fid,  'int32',   1)[0])
         fid.seek(316,0)
-        npts    = int(sp.fromfile(fid,  'int32',   1)[0])
+        npts    = int(np.fromfile(fid,  'int32',   1)[0])
         fid.seek(632,0);
-        depvar  = sp.array(sp.fromfile(fid,'float32',npts),dtype='f')
+        depvar  = np.array(np.fromfile(fid,'float32',npts),dtype='f')
         fid.close();
         return [depvar,delta,npts,b, nzyear,nzjday,nzhour,nzmin,nzsec,nzmsec]
     except IOError:
@@ -66,8 +66,8 @@ def seisound_stereo(sacfile1,sacfile2,wavfile='o_seismosound.wav',acc = 3125,for
         
     # Format conversion 
     Nbytes =  struct.calcsize(format)
-    depvar1 = sp.cast[format](depvar1/sp.absolute(depvar1).max() * (2**(Nbytes*8-1)-1))
-    depvar2 = sp.cast[format](depvar2/sp.absolute(depvar2).max() * (2**(Nbytes*8-1)-1))
+    depvar1 = np.cast[format](depvar1/np.absolute(depvar1).max() * (2**(Nbytes*8-1)-1))
+    depvar2 = np.cast[format](depvar2/np.absolute(depvar2).max() * (2**(Nbytes*8-1)-1))
     
     # Write wav file
     w = wave.open(wavfile,'w')
